@@ -1,0 +1,30 @@
+[project]
+name = "my-min-agent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Chen-a398", email = "a13725364618@163.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "anthropic>=1.4.0",
+    "openai>=3.11.0",
+    "pydantic>=2.13.5",
+]
+
+[project.scripts]
+my-min-agent = "my_min_agent:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["my_min_agent", "my_min_agent.LLM", "my_min_agent.Tool", "my_min_agent.schema"]
+
+[tool.setuptools.package-dir]
+"my_min_agent" = "."
+"my_min_agent.LLM" = "LLM"
+"my_min_agent.Tool" = "Tool"
+"my_min_agent.schema" = "schema"
