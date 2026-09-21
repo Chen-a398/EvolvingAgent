@@ -8,10 +8,10 @@ from typing import Optional
 
 import tiktoken
 
-from .llm import LLMClient
+from .LLM import LLMClient
 from .logger import AgentLogger
 from .schema import Message
-from .tools.base import Tool, ToolResult
+from .Tool.base import Tool, ToolResult
 from .utils import calculate_display_width
 
 
