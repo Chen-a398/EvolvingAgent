@@ -12,7 +12,7 @@ from .LLM import LLMClient
 from .logger import AgentLogger
 from .schema import Message
 from .Tool.base import Tool, ToolResult
-from .utils import calculate_display_width
+from .utils.terminal_utils import calculate_display_width
 
 
 # ANSI color codes
