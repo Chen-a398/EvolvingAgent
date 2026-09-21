@@ -489,12 +489,28 @@ Requirements:
                         result_text = result_text[:300] + f"{Colors.DIM}...{Colors.RESET}"
                     print(f"{Colors.BRIGHT_GREEN}✓ Result:{Colors.RESET} {result_text}")
                 else:
-                    print(f"{Colors.BRIGHT_RED}✗ Error:{Colors.RESET} {Colors.RED}{result.error}{Colors.RESET}")
+                   
+                        correction_prompt = f"""
+                    The previous tool execution failed.
+
+                    Tool:
+                    {function_name}
+
+                    Arguments:
+                    {json.dumps(arguments, ensure_ascii=False, indent=2)}
+
+                    Error:
+                    {result.error}
+
+                    You must analyze why the tool call failed and correct your approach.
+                    Do NOT repeat the exact same failed tool call.
+                    Use the error information to decide what to do next.
+                    """
 
                 # Add tool result message
                 tool_msg = Message(
                     role="tool",
-                    content=result.content if result.success else f"Error: {result.error}",
+                    content=result.content if result.success else f"Error: {correction_prompt}",
                     tool_call_id=tool_call_id,
                     name=function_name,
                 )

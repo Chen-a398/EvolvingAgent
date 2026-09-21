@@ -38,40 +38,32 @@ def async_retry(
 )->Callable:
     if config is None:
         config = RetryConfig()
-        def decorator(func: Callable[..., Any])->Callable[...,Any]:
-            @functools.wraps(func)
-            async def wrapper(*args,**kwargs)->Any:
-                last_exception: Exception | None = None
-                for attempt in range(config.max_retries+1):
-                    try:
-                        return await func( *args,**kwargs)
-                    except config.retryable_exceptions as e:
-                        last_exception =e
 
-                    if attempt >= config.max_retries:
-                        logger.error(f"Function {func.__name__} retry failed, reached maximum retry count {config.max_retries}")
-                        raise RetryExhaustedError(e, attempt + 1)
-                    delay = config.calculate_delay(attempt)
-                    # Log
-                    logger.warning(
-                        f"Function {func.__name__} call {attempt + 1} failed: {str(e)}, "
-                        f"retrying attempt {attempt + 2} after {delay:.2f} seconds"
-                    )
-                    if on_retry:
-                        on_retry(e,attempt+1)
-                    await asyncio.sleep(delay)
+    def decorator(func: Callable[..., Any])->Callable[...,Any]:
+        @functools.wraps(func)
+        async def wrapper(*args,**kwargs)->Any:
+            last_exception: Exception | None = None
+            for attempt in range(config.max_retries+1):
+                try:
+                    return await func( *args,**kwargs)
+                except config.retryable_exceptions as e:
+                    last_exception =e
 
-                if last_exception:
-                    raise last_exception
-                raise Exception("unknown error")
-            return wrapper
-        return decorator               
+                if attempt >= config.max_retries:
+                    logger.error(f"Function {func.__name__} retry failed, reached maximum retry count {config.max_retries}")
+                    raise RetryExhaustedError(last_exception, attempt + 1)
+                delay = config.calculate_delay(attempt)
+                # Log
+                logger.warning(
+                    f"Function {func.__name__} call {attempt + 1} failed: {str(last_exception)}, "
+                    f"retrying attempt {attempt + 2} after {delay:.2f} seconds"
+                )
+                if on_retry:
+                    on_retry(last_exception,attempt+1)
+                await asyncio.sleep(delay)
 
-    
-
-
-
-
-
-
-        
+            if last_exception:
+                raise last_exception
+            raise Exception("unknown error")
+        return wrapper
+    return decorator
